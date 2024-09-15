@@ -22,31 +22,51 @@ h1 {
     display: grid;
     grid-template-columns: repeat(8, 50px);
     grid-template-rows: repeat(8, 50px);
-    gap: 2px;
+    
     margin: 20px auto;
     border: 2px solid #333;
 }
 
 /* Chess squares */
 .white {
-    background-color: #eee;
+    background-color: #f0cca9;
 }
 
 .black {
-    background-color: #444;
+    background-color: #eca259;
 }
 
-/* Chess pieces */
 .square {
     width: 50px;
     height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
     font-size: 32px;
     cursor: pointer;
 }
+svg{
+    width:100%;
+    height: 100%;
+    position: relative;
+    z-index: -9;
+}
+path{
+    position: relative;
+    z-index: -10;
+}
+.square span {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    z-index: 9;
+}
 
+
+.pices-white{
+    fill: #f4f4f4;
+}
 /* Controls styling */
 .controls {
     margin-top: 20px;

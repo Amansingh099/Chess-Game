@@ -8,69 +8,81 @@ let board = [
     '', '', '', '', '', '', '', '',
     '', '', '', '', '', '', '', '',
     '', '', '', '', '', '', '', '',
-    '', '', '', '', '', '', '', '',
-    '', '', '', '', '', '', '', '',
     pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn,
     rook, knight, bishop, queen, king, bishop, knight, rook
 ];
 let selectedPiece = null;
 
 function initializeBoard() {
-    board = [];
-    for (let row = 0; row < boardSize; row++) {
-        const boardRow = [];
-        for (let col = 0; col < boardSize; col++) {
-            const square = document.createElement('div');
-            square.classList.add('square', (row + col) % 2 === 0 ? 'white' : 'black');
-            square.dataset.row = row;
-            square.dataset.col = col;
+    boardElement.innerHTML = '';
+    for (let i = 0; i < boardSize * boardSize; i++) {
+        const square = document.createElement('div');
+        square.classList.add('square');
+        square.dataset.index = i;
 
-            // Add pieces (simplified, just pawns for now)
-            if (row === 1) square.textContent = '♟';  // Black Pawn
-            if (row === 6) square.textContent = '♙';  // White Pawn
-
-            square.addEventListener('click', onSquareClick);
-            boardRow.push(square);
-            boardElement.appendChild(square);
+        // Set square color
+        if (Math.floor(i / boardSize) % 2 === 0) {
+            square.classList.add(i % 2 === 0 ? 'white' : 'black');
+        } else {
+            square.classList.add(i % 2 === 0 ? 'black' : 'white');
         }
-        board.push(boardRow);
+
+        // Set piece if present
+        if (board[i] !== '') {
+            const piece = document.createElement('span');
+            piece.innerHTML = board[i];
+            piece.draggable = true;
+            if (i > 47) {
+                piece.classList.add("pices-white");
+            }
+            piece.dataset.index = i;
+            piece.addEventListener('dragstart', handleDragStart);
+            square.appendChild(piece);
+        }
+
+        square.addEventListener('dragover', handleDragOver);
+        square.addEventListener('drop', handleDrop);
+
+        boardElement.appendChild(square);
     }
 }
 
-// Handle piece selection and movement
-function onSquareClick(event) {
-    const square = event.target;
-    const row = parseInt(square.dataset.row);
-    const col = parseInt(square.dataset.col);
-    const piece = square.textContent;
-
-    // If no piece is selected, select the clicked piece
-    if (selectedPiece === null && piece) {
-        selectedPiece = { row, col, piece };
-        square.classList.add('selected');
-    } else if (selectedPiece) {
-        // Move selected piece to the new square
-        movePiece(selectedPiece.row, selectedPiece.col, row, col);
-        selectedPiece = null;
-        clearSelection();
-    }
+function handleDragStart(event) {
+    
+    const pieceIndex = event.target.dataset.index;
+    event.dataTransfer.setData('text/plain', pieceIndex);
 }
 
-// Move the selected piece to the target square
-function movePiece(fromRow, fromCol, toRow, toCol) {
-    const fromSquare = board[fromRow][fromCol];
-    const toSquare = board[toRow][toCol];
-
-    // Move the piece
-    toSquare.textContent = fromSquare.textContent;
-    fromSquare.textContent = '';
+function handleDragOver(event) {
+    event.preventDefault();  // Allow the drop event
 }
 
-// Clear selected piece highlighting
-function clearSelection() {
-    document.querySelectorAll('.selected').forEach(square => {
-        square.classList.remove('selected');
-    });
+function handleDrop(event) {
+    event.preventDefault();
+    const fromIndex = event.dataTransfer.getData('text');
+    const toIndex = event.target.dataset.index;
+    
+    movePiece(fromIndex, toIndex);
+}
+
+function movePiece(fromIndex, toIndex) {
+    
+    const fromSquare = document.querySelector(`div[data-index="${fromIndex}"]`);
+    const toSquare = document.querySelector(`div[data-index="${toIndex}"]`);
+    
+    const piece = fromSquare.querySelector('span');
+    if (!piece) return; // No piece to move
+
+    // Move the piece in the DOM
+    toSquare.innerHTML = '';
+    toSquare.appendChild(piece);
+
+    // Update the board array
+    board[toIndex] = board[fromIndex];
+    board[fromIndex] = '';
+
+    // Clear the original square's inner HTML
+    fromSquare.innerHTML = '';
 }
 
 // Initialize the chessboard when the page loads
