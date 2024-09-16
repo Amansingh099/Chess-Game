@@ -55,17 +55,22 @@ svg{
 path{
     position: relative;
     z-index: -10;
+    
 }
 .square span {
     width: 80%;
     height: 80%;
     position: relative;
     z-index: 9;
+    
 }
 
 
-.pices-white{
+.pieces-white{
     fill: #f4f4f4;
+}
+.pieces-black{
+    fill:#333;
 }
 /* Controls styling */
 .controls {
