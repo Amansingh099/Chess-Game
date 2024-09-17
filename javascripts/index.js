@@ -28,7 +28,7 @@ function initializeBoard() {
 
         // Set piece if present
         if (board[i] !== '') {
-            square.innerHTML=board[i];
+            square.innerHTML = board[i];
             const piece=square.querySelector('span');
             
             piece.draggable = true;

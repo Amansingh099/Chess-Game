@@ -3,10 +3,10 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: first baseline;
     height: 100vh;
-    margin: 0;
+    margin: 0 100px;
 }
 
 #game {
@@ -20,10 +20,8 @@ h1 {
 /* Chessboard styling */
 #game-board {
     display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
-    
-    margin: 20px auto;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
     border: 2px solid #333;
 }
 
@@ -37,8 +35,8 @@ h1 {
 }
 
 .square {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
