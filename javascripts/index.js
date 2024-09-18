@@ -86,6 +86,8 @@ function handleDrop(event) {
             alert(still in check);
         }
         switchTurn(); 
+    } else {
+        alert("wrong move");
     }
 }
 
