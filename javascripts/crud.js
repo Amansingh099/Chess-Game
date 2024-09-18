@@ -1,7 +1,5 @@
-// Save the current game state to localStorage
 function saveGame() {
     const gameState = [];
-    // Save the current board state
     for (let i = 0; i < boardSize * boardSize; i++) {
         const square = document.querySelector(`div[data-index="${i}"]`);
         const piece = square.querySelector('span');
@@ -9,45 +7,56 @@ function saveGame() {
             const pieceData = {
                 id: piece.id, // E.g., 'king', 'rook', etc.
                 color: piece.classList.contains('pieces-white') ? 'white' : 'black',
-                index: i // Save the position of the piece
+                index: i 
             };
-            console.log(pieceData);
             gameState.push(pieceData);
         } else {
-            gameState.push(null); // No piece on this square
+            gameState.push(null);
         }
     }
 
-    localStorage.setItem('chessGame', JSON.stringify(gameState));
-    alert("Game saved successfully!");
+    const gameName = prompt("Enter a name for this saved game:");
+    if (gameName) {
+        let savedGames = JSON.parse(localStorage.getItem('chessGames')) || {};
+        savedGames[gameName] = gameState;
+        localStorage.setItem('chessGames', JSON.stringify(savedGames));
+        alert("Game saved successfully!");
+
+        populateSavedGamesList();
+    } else {
+        alert("Game save canceled.");
+    }
 }
 
-// Load the saved game state from localStorage
-function loadGame() {
-    const savedState = JSON.parse(localStorage.getItem('chessGame'));
 
-    if (savedState) {
+function loadGame(gameName) {
+    const savedGames = JSON.parse(localStorage.getItem('chessGames'));
+
+    if (savedGames && savedGames[gameName]) {
+        const savedState = savedGames[gameName];
+
         boardElement.innerHTML = '';
         for (let i = 0; i < boardSize * boardSize; i++) {
             const square = document.createElement('div');
             square.classList.add('square');
             square.dataset.index = i;
 
-            // Set square color
+ 
             if (Math.floor(i / boardSize) % 2 === 0) {
                 square.classList.add(i % 2 === 0 ? 'white' : 'black');
             } else {
                 square.classList.add(i % 2 === 0 ? 'black' : 'white');
             }
-             square.addEventListener('dragover', handleDragOver);
-             square.addEventListener('drop', handleDrop);
-            boardElement.appendChild(square);
-        } 
 
+            square.addEventListener('dragover', handleDragOver);
+            square.addEventListener('drop', handleDrop);
+            boardElement.appendChild(square);
+        }
+
+    
         savedState.forEach((pieceData, index) => {
             const square = document.querySelector(`div[data-index="${index}"]`);
             if (pieceData) {
-                // Create a new piece element
                 switch (pieceData.id) {
                     case 'pawn':
                         square.innerHTML = pawn;
@@ -70,22 +79,63 @@ function loadGame() {
                 }
                 const piece = square.querySelector('span');
                 piece.classList.add(pieceData.color === 'white' ? 'pieces-white' : 'pieces-black');
-                // Ad event listeners for drag and drop
                 piece.draggable = true;
                 piece.dataset.index = index;
                 piece.addEventListener('dragstart', handleDragStart);
             }
         });
 
-        alert("Game loaded successfully!");
+        alert(`Game "${gameName}" loaded successfully!`);
     } else {
-        alert("No saved game found.");
+        alert("Game not found.");
     }
 }
 
 
-// Delete the saved game state from localStorage
+
 function deleteGame() {
-    localStorage.removeItem('chessGame');
-    alert("Saved game deleted.");
+    const savedGames = JSON.parse(localStorage.getItem('chessGames'));
+
+    if (savedGames) {
+        const gameNames = Object.keys(savedGames);
+        if (gameNames.length === 0) {
+            alert("No saved games to delete.");
+            return;
+        }
+
+        const gameName = prompt(`Enter the name of the game to delete:\n${gameNames.join('\n')}`);
+        if (gameName && savedGames[gameName]) {
+            delete savedGames[gameName];
+            localStorage.setItem('chessGames', JSON.stringify(savedGames));
+            alert("Game deleted successfully.");
+
+            // Update the list of saved games
+            populateSavedGamesList();
+        } else {
+            alert("Game not found.");
+        }
+    } else {
+        alert("No saved games found.");
+    }
 }
+function populateSavedGamesList() {
+    const savedGamesList = document.getElementById('savedGamesList');
+    savedGamesList.innerHTML = ''; // Clear the list before populating
+
+    const savedGames = JSON.parse(localStorage.getItem('chessGames')) || {};
+
+    Object.keys(savedGames).forEach(gameName => {
+        const li = document.createElement('li');
+        li.textContent = gameName;
+
+        // Add click event to load the selected game
+        li.addEventListener('click', () => loadGame(gameName));
+
+        savedGamesList.appendChild(li);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    populateSavedGamesList(); // Populate the saved games list when the page loads
+});
+

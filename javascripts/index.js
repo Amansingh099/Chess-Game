@@ -1,6 +1,13 @@
 // Create a chess board and set up pieces
 const boardElement = document.getElementById('game-board');
 const boardSize = 8;
+let currentPlayer = 'white';
+let timerWhite = 600; 
+let timerBlack = 600; 
+let timerInterval; 
+
+const whiteTimerElement = document.getElementById('white-timer');
+const blackTimerElement = document.getElementById('black-timer');
 let board = [
     rook, knight, bishop, queen, king, bishop, knight, rook,
     pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn,
@@ -51,9 +58,18 @@ function initializeBoard() {
 }
 
 function handleDragStart(event) {
-    const pieceIndex = event.target.dataset.index;
+    const piece = event.target;
+    const pieceColor = piece.classList.contains('pieces-white') ? 'white' : 'black';
+
+    if (pieceColor !== currentPlayer) {
+        event.preventDefault();
+        return;
+    }
+
+    const pieceIndex = piece.dataset.index;
     event.dataTransfer.setData('text/plain', pieceIndex);
 }
+
 
 function handleDragOver(event) {
     event.preventDefault();  // Allow the drop event
@@ -63,11 +79,16 @@ function handleDrop(event) {
     event.preventDefault();
     const fromIndex = event.dataTransfer.getData('text');
     const toIndex = event.target.dataset.index;
-    if (isvalidmove(fromIndex, toIndex))
-    {
+    if (isvalidmove(fromIndex, toIndex)) {
         movePiece(fromIndex, toIndex);
-    } 
+        if (isInCheck(currentPlayer)) {
+            movePiece(toIndex, fromIndex);
+            alert(still in check);
+        }
+        switchTurn(); 
+    }
 }
+
 // to check if the move is valid or not
 function isvalidmove(fromIndex, toIndex) {
     const fromSquare = document.querySelector(`div[data-index="${fromIndex}"]`);
@@ -96,7 +117,7 @@ function isvalidmove(fromIndex, toIndex) {
         case "pawn":
             // Pawn moves (not including en passant or promotion for simplicity)
             if (pieceColor === 'white') {
-                // White pawns move up (row decreases)
+               
                 if (fromCol === toCol && rowDiff === 1 && !targetPiece) return true; // Move one step forward
                 if (fromCol === toCol && rowDiff === 2 && !targetPiece && fromRow === 6) return true; // Move two steps forward from start
                 if (rowDiff === 1 && colDiff === 1 && targetPiece && targetColor === 'black') return true; // Capture diagonally
@@ -141,7 +162,7 @@ function isvalidmove(fromIndex, toIndex) {
         default:
             return false; 
     }
-    alert("wrong move");
+    // alert("wrong move");
     return false;
 }
 function isRookPathBlocked(fromRow, fromCol, toRow, toCol) {
@@ -198,17 +219,7 @@ function movePiece(fromIndex, toIndex) {
     const fromSquare = document.querySelector(`div[data-index="${fromIndex}"]`);
     const toSquare = document.querySelector(`div[data-index="${toIndex}"]`);
     const piece = fromSquare.querySelector('span');
-    // const targetpiece = toSquare.querySelector('span');
-    // if (targetpiece) {
-    //     const color1 = piece.classList.contains("pieces-white") ? 1 : 0;
-    //     const color2 = targetpiece.classList.contains("pieces-white") ? 1 : 0;
-    //     if (color1 == color2) return;
-    // }
-    if (!piece) {
-        return;
-    } // No piece to move
-    
-    // Move the piece in the DOM
+
     toSquare.innerHTML = '';
     toSquare.appendChild(piece);
 
@@ -219,6 +230,138 @@ function movePiece(fromIndex, toIndex) {
     // Clear the original square's inner HTML
     fromSquare.innerHTML = '';
 }
+function switchTurn() {
+    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
 
-// Initialize the chessboard when the page loads
-document.addEventListener('DOMContentLoaded', initializeBoard);
+    if (isInCheck(currentPlayer)) {
+        if (isCheckmate(currentPlayer)) {
+            alert(`${currentPlayer === 'white' ? 'Black' : 'White'} wins by checkmate!`);
+        } else {
+            alert(`${currentPlayer} is in check!`);
+        }
+    }
+
+    startTimer();  // Restart the timer for the current player
+}
+
+
+function startTimer() {
+    clearInterval(timerInterval);  // Clear the existing timer
+
+    timerInterval = setInterval(() => {
+        if (currentPlayer === 'white') {
+            timerWhite--;
+            whiteTimerElement.textContent = `${formatTime(timerWhite)}`;
+            if (timerWhite === 0) {
+                clearInterval(timerInterval);
+                alert('White ran out of time! Black wins.');
+                return;
+            }
+        } else {
+            timerBlack--;
+            blackTimerElement.textContent = `${formatTime(timerBlack)}`;
+            if (timerBlack === 0) {
+                clearInterval(timerInterval);
+                alert('Black ran out of time! White wins.');
+                return;
+            }
+        }
+    }, 1000);  // Decrement timer every second
+}
+
+// Function to format time as mm:ss
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+// checkmate logic
+function isInCheck(playerColor) {
+    const kingSquare = findKingPosition(playerColor);  // Get king's current position
+    const opponentColor = playerColor === 'white' ? 'black' : 'white';
+
+    for (let i = 0; i < boardSize * boardSize; i++) {
+        const square = document.querySelector(`div[data-index="${i}"]`);
+        const piece = square.querySelector('span');
+
+        if (piece && piece.classList.contains(`pieces-${opponentColor}`)) {
+            // Check if this piece can move to the king's square (threatening the king)
+            if (isvalidmove(i, kingSquare)) {
+                return true;  // King is in check
+            }
+        }
+    }
+    return false;  // King is not in check
+}
+
+// Helper function to find the king's position on the board
+function findKingPosition(playerColor) {
+    for (let i = 0; i < boardSize * boardSize; i++) {
+        const square = document.querySelector(`div[data-index="${i}"]`);
+        const piece = square.querySelector('span');
+
+        if (piece && piece.id === 'king' && piece.classList.contains(`pieces-${playerColor}`)) {
+            return i;  // Return the index of the king
+        }
+    }
+}
+
+function isCheckmate(playerColor) {
+    const kingSquare = findKingPosition(playerColor);
+
+    // Try moving the king to all adjacent squares
+    const possibleMoves = [
+        kingSquare - boardSize - 1, kingSquare - boardSize, kingSquare - boardSize + 1,  // Upper row
+        kingSquare - 1, kingSquare + 1,                        // Left and right
+        kingSquare + boardSize - 1, kingSquare + boardSize, kingSquare + boardSize + 1   // Lower row
+    ];
+
+    for (const move of possibleMoves) {
+        if (move >= 0 && move < boardSize * boardSize && isvalidmove(kingSquare, move)) {
+            const originalBoardState = [...board];  // Save the original board state
+            movePiece(kingSquare, move);  // Try to move the king
+            if (!isInCheck(playerColor)) {
+                // Restore the board and return false (not checkmate)
+                board = originalBoardState;
+                movePiece(move, kingSquare);
+                return false;
+            }
+            movePiece(move, kingSquare);
+            // Restore the board after checking
+            board = originalBoardState;
+        }
+    }
+
+    // No valid king moves, check if any piece can block or capture the threat
+    for (let i = 0; i < boardSize * boardSize; i++) {
+        const square = document.querySelector(`div[data-index="${i}"]`);
+        const piece = square.querySelector('span');
+
+        if (piece && piece.classList.contains(`pieces-${playerColor}`)) {
+            for (let j = 0; j < boardSize * boardSize; j++) {
+                if (isvalidmove(i, j)) {
+                    const originalBoardState = [...board];  // Save the original board state
+                    movePiece(i, j);  // Try the move
+                    if (!isInCheck(playerColor)) {
+                        // Restore the board and return false (not checkmate)
+                        board = originalBoardState;
+                        movePiece(j,i);
+                        return false;
+                    }
+                    // Restore the board after checking
+                    movePiece(j, i);
+                    board = originalBoardState;
+                }
+            }
+        }
+    }
+
+    return true;  // Checkmate if no valid moves were found
+}
+
+// Initialize the timers on page load
+document.addEventListener('DOMContentLoaded', () => {
+    whiteTimerElement.textContent = `${formatTime(timerWhite)}`;
+    blackTimerElement.textContent = `${formatTime(timerBlack)}`;
+    initializeBoard();
+});

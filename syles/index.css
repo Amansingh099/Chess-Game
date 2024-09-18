@@ -1,91 +1,163 @@
 /* Body and game setup styling */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: left;
-    align-items: first baseline;
-    height: 100vh;
-    margin: 0 100px;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  /* margin: 0 100px; */
 }
 
 #game {
-    text-align: center;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
 }
 
 h1 {
-    color: #333;
+  color: #333;
 }
 
 /* Chessboard styling */
 #game-board {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    border: 2px solid #333;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  border: 2px solid #333;
 }
 
 /* Chess squares */
 .white {
-    background-color: #f0cca9;
+  background-color: #f0cca9;
 }
 
 .black {
-    background-color: #eca259;
+  background-color: #eca259;
 }
 
 .square {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    font-size: 32px;
-    cursor: pointer;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-size: 32px;
+  cursor: pointer;
 }
-svg{
-    width:100%;
-    height: 100%;
-    position: relative;
-    z-index: -9;
+.square svg {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: -9;
 }
-path{
-    position: relative;
-    z-index: -10;
+.square svg path {
+  position: relative;
+  z-index: -10;
+}
+
+a svg{
     
+    width: 30px;
 }
 .square span {
-    width: 80%;
-    height: 80%;
-    position: relative;
-    z-index: 9;
-    
+  width: 80%;
+  height: 80%;
+  position: relative;
+  z-index: 9;
 }
 
-
-.pieces-white{
-    fill: #f4f4f4;
+.pieces-white {
+  fill: #f4f4f4;
 }
-.pieces-black{
-    fill:#333;
+.pieces-black {
+  fill: #333;
 }
 /* Controls styling */
 .controls {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 button {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    background-color: #333;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
 }
 
 button:hover {
-    background-color: #555;
+  background-color: #555;
+}
+
+/* ---------------------------- */
+#savedGamesPanel {
+  padding: 10px;
+  margin-left: 100px;
+  min-width: 20vw;
+}
+.controls {
+  margin-top: 20px;
+}
+
+#savedGamesPanel ul {
+  list-style: none;
+  padding: 0;
+}
+
+#savedGamesPanel ul li {
+  padding: 5px;
+  margin-bottom: 5px;
+  color: rgb(5, 5, 5);
+  background-color: #ccbfbf;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#savedGamesPanel ul li:hover {
+  background-color: #e0e0e0;
+}
+
+
+#timers {
+    
+    
+    margin: 20px 0;
+}
+
+#white-timer {
+    border-radius: 50%;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 5px;
+    border: 2px solid #333;
+    font-size: 18px;
+    font-weight: bold;
+}
+#black-timer {
+    border-radius: 50%;
+    padding: 10px;
+    display: inline-block;
+    margin-bottom: 5px;
+    border: 2px solid #333;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    #game {
+        flex-direction: column; /* Stack game and saved games vertically */
+    }
+    .square{
+        width: 40px;
+        height: 40px;
+    }
+    #savedGamesPanel {
+        width: 100%;
+        margin-left: 0;  /* Remove left margin */
+        margin-top: 20px; /* Add margin to the top for spacing */
+    }
 }
