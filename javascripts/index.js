@@ -221,7 +221,6 @@ function movePiece(fromIndex, toIndex) {
     const fromSquare = document.querySelector(`div[data-index="${fromIndex}"]`);
     const toSquare = document.querySelector(`div[data-index="${toIndex}"]`);
     const piece = fromSquare.querySelector('span');
-
     toSquare.innerHTML = '';
     toSquare.appendChild(piece);
 
@@ -324,8 +323,9 @@ function isCheckmate(playerColor) {
             movePiece(kingSquare, move);  // Try to move the king
             if (!isInCheck(playerColor)) {
                 // Restore the board and return false (not checkmate)
-                board = originalBoardState;
-                movePiece(move, kingSquare);
+                // board = originalBoardState;
+                // movePiece(move, kingSquare);
+                switchTurn() //temporary
                 return false;
             }
             movePiece(move, kingSquare);
@@ -346,8 +346,9 @@ function isCheckmate(playerColor) {
                     movePiece(i, j);  // Try the move
                     if (!isInCheck(playerColor)) {
                         // Restore the board and return false (not checkmate)
-                        board = originalBoardState;
-                        movePiece(j,i);
+                        // board = originalBoardState;
+                        // movePiece(j,i);
+                        switchTurn() //temporary
                         return false;
                     }
                     // Restore the board after checking
