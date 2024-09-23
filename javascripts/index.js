@@ -83,9 +83,10 @@ function handleDrop(event) {
         movePiece(fromIndex, toIndex);
         if (isInCheck(currentPlayer)) {
             movePiece(toIndex, fromIndex);
-            alert(still in check);
+            alert("still in check");
+        } else {
+            switchTurn();
         }
-        switchTurn(); 
     } else {
         alert("wrong move");
     }
@@ -323,9 +324,9 @@ function isCheckmate(playerColor) {
             movePiece(kingSquare, move);  // Try to move the king
             if (!isInCheck(playerColor)) {
                 // Restore the board and return false (not checkmate)
-                // board = originalBoardState;
-                // movePiece(move, kingSquare);
-                switchTurn() //temporary
+                board = originalBoardState;
+                movePiece(move, kingSquare);
+              
                 return false;
             }
             movePiece(move, kingSquare);
@@ -345,10 +346,10 @@ function isCheckmate(playerColor) {
                     const originalBoardState = [...board];  // Save the original board state
                     movePiece(i, j);  // Try the move
                     if (!isInCheck(playerColor)) {
-                        // Restore the board and return false (not checkmate)
-                        // board = originalBoardState;
-                        // movePiece(j,i);
-                        switchTurn() //temporary
+                        
+                        board = originalBoardState;
+                        movePiece(j,i);
+                      
                         return false;
                     }
                     // Restore the board after checking
