@@ -56,18 +56,51 @@ function initializeBoard() {
         boardElement.appendChild(square);
     }
 }
+function highlightValidMoves(fromIndex) {
+    const fromSquare = document.querySelector(`div[data-index="${fromIndex}"]`);
+    const piece = fromSquare.querySelector('span');
+    const pieceId = piece.id;
+    const pieceColor = piece.classList.contains("pieces-white") ? 'white' : 'black';
+    
+
+    for (let i = 0; i < boardSize * boardSize; i++) {
+        const targetSquare = document.querySelector(`div[data-index="${i}"]`);
+        
+        if (targetSquare && isvalidmove(fromIndex, i)) {
+          
+            const square = document.createElement('div');
+            square.classList.add('valid-move'); 
+            targetSquare.append(square);
+        }
+    }
+}
+ function clearHighlights() {
+    const allSquares = document.querySelectorAll('.square');
+    allSquares.forEach(square => {
+        const span = square.querySelector("div.valid-move");
+        if (span) {
+            console.log(square.innerHTML);
+            span.remove();
+            console.log(square.innerHTML);
+        }
+        
+    });
+}
 
 function handleDragStart(event) {
     const piece = event.target;
     const pieceColor = piece.classList.contains('pieces-white') ? 'white' : 'black';
 
     if (pieceColor !== currentPlayer) {
+        const oppositecolor = pieceColor == 'black' ? "white" : "black";
+        alert(oppositecolor + " turn");
         event.preventDefault();
         return;
     }
 
     const pieceIndex = piece.dataset.index;
     event.dataTransfer.setData('text/plain', pieceIndex);
+     highlightValidMoves(pieceIndex);
 }
 
 
@@ -77,6 +110,9 @@ function handleDragOver(event) {
 
 function handleDrop(event) {
     event.preventDefault();
+    setTimeout(() => {
+        clearHighlights(); // Clear highlights after the move logic completes
+    }, 100);
     const fromIndex = event.dataTransfer.getData('text');
     const toIndex = event.target.dataset.index;
     if (isvalidmove(fromIndex, toIndex)) {
@@ -98,7 +134,7 @@ function isvalidmove(fromIndex, toIndex) {
     const toSquare = document.querySelector(`div[data-index="${toIndex}"]`);
     const piece = fromSquare.querySelector('span');
     const targetPiece = toSquare.querySelector('span');
-
+    
     if (!piece) return false; // No piece to move
     const pieceId = piece.id;
     const pieceColor = piece.classList.contains("pieces-white") ? 'white' : 'black';
@@ -319,9 +355,12 @@ function isCheckmate(playerColor) {
     ];
 
     for (const move of possibleMoves) {
-        if (move >= 0 && move < boardSize * boardSize && isvalidmove(kingSquare, move)) {
-            const originalBoardState = [...board];  // Save the original board state
-            movePiece(kingSquare, move);  // Try to move the king
+        const toSquare = document.querySelector(`div[data-index="${move}"]`);
+        const targetPiece = toSquare != null ? toSquare.querySelector('span') : null;
+        if (move >= 0 && move < boardSize * boardSize && isvalidmove(kingSquare, move) && targetPiece === null) {
+            console.log(targetPiece);
+            const originalBoardState = [...board];
+            movePiece(kingSquare, move);  
             if (!isInCheck(playerColor)) {
                 // Restore the board and return false (not checkmate)
                 board = originalBoardState;

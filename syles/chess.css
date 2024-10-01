@@ -146,6 +146,15 @@ button:hover {
     font-size: 18px;
     font-weight: bold;
 }
+.valid-move {
+    width: 60px; /* Adjust the size as needed */
+    height: 60px; /* Adjust the size as needed */
+    background-color: rgba(249, 252, 249, 0.5); /* Light green */
+    border-radius: 50%; 
+    display: flex;
+    
+}
+
 
 @media (max-width: 768px) {
     #game {
