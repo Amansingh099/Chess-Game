@@ -149,8 +149,8 @@ button:hover {
 .valid-move {
     width: 60px; /* Adjust the size as needed */
     height: 60px; /* Adjust the size as needed */
-    background-color: rgba(249, 252, 249, 0.5); /* Light green */
-    border-radius: 50%; 
+    background-color: rgba(80, 231, 80, 0.5); /* Light green */
+    
     display: flex;
     
 }
@@ -170,3 +170,32 @@ button:hover {
         margin-top: 20px; /* Add margin to the top for spacing */
     }
 }
+/* Toast container */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  box-shadow: 5px 5px 5px rgb(113, 207, 113); /* Green shadow */
+
+}
+
+.toast {
+  display: block;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.5rem;
+  min-width: 30vw;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fbf3f3;
+  color: rgb(0, 0, 0);
+  border-radius: 50px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.toast.show {
+  opacity: 1;
+}
+

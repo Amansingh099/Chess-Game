@@ -61,31 +61,25 @@ function highlightValidMoves(fromIndex) {
     const piece = fromSquare.querySelector('span');
     const pieceId = piece.id;
     const pieceColor = piece.classList.contains("pieces-white") ? 'white' : 'black';
-    
 
     for (let i = 0; i < boardSize * boardSize; i++) {
         const targetSquare = document.querySelector(`div[data-index="${i}"]`);
-        
+
         if (targetSquare && isvalidmove(fromIndex, i)) {
-          
-            const square = document.createElement('div');
-            square.classList.add('valid-move'); 
-            targetSquare.append(square);
+            targetSquare.classList.add('valid-move');  // Correct way to add the class
         }
     }
 }
- function clearHighlights() {
+
+function clearHighlights() {
     const allSquares = document.querySelectorAll('.square');
     allSquares.forEach(square => {
-        const span = square.querySelector("div.valid-move");
-        if (span) {
-            console.log(square.innerHTML);
-            span.remove();
-            console.log(square.innerHTML);
+        if (square.classList.contains('valid-move')) {
+            square.classList.remove('valid-move');  // Remove the class from squares
         }
-        
     });
 }
+
 
 function handleDragStart(event) {
     const piece = event.target;
@@ -93,7 +87,7 @@ function handleDragStart(event) {
 
     if (pieceColor !== currentPlayer) {
         const oppositecolor = pieceColor == 'black' ? "white" : "black";
-        alert(oppositecolor + " turn");
+        showToast(oppositecolor + " turn");
         event.preventDefault();
         return;
     }
@@ -119,12 +113,12 @@ function handleDrop(event) {
         movePiece(fromIndex, toIndex);
         if (isInCheck(currentPlayer)) {
             movePiece(toIndex, fromIndex);
-            alert("still in check");
+            showToast("still in check");
         } else {
             switchTurn();
         }
     } else {
-        alert("wrong move");
+        showToast("wrong move");
     }
 }
 
@@ -134,7 +128,7 @@ function isvalidmove(fromIndex, toIndex) {
     const toSquare = document.querySelector(`div[data-index="${toIndex}"]`);
     const piece = fromSquare.querySelector('span');
     const targetPiece = toSquare.querySelector('span');
-    
+
     if (!piece) return false; // No piece to move
     const pieceId = piece.id;
     const pieceColor = piece.classList.contains("pieces-white") ? 'white' : 'black';
@@ -154,14 +148,11 @@ function isvalidmove(fromIndex, toIndex) {
 
     switch (pieceId) {
         case "pawn":
-            // Pawn moves (not including en passant or promotion for simplicity)
             if (pieceColor === 'white') {
-               
                 if (fromCol === toCol && rowDiff === 1 && !targetPiece) return true; // Move one step forward
                 if (fromCol === toCol && rowDiff === 2 && !targetPiece && fromRow === 6) return true; // Move two steps forward from start
                 if (rowDiff === 1 && colDiff === 1 && targetPiece && targetColor === 'black') return true; // Capture diagonally
             } else {
-                // Black pawns move down (row increases)
                 if (fromCol === toCol && rowDiff === 1 && !targetPiece) return true; // Move one step forward
                 if (fromCol === toCol && rowDiff === 2 && !targetPiece && fromRow === 1) return true; // Move two steps forward from start
                 if (rowDiff === 1 && colDiff === 1 && targetPiece && targetColor === 'white') return true; // Capture diagonally
@@ -169,41 +160,37 @@ function isvalidmove(fromIndex, toIndex) {
             break;
 
         case "rook":
-            // Rook moves (straight lines)
             if ((rowDiff === 0 && colDiff > 0) || (rowDiff > 0 && colDiff === 0)) return !isRookPathBlocked(fromRow, fromCol, toRow, toCol);
             break;
 
         case "bishop":
-            // Bishop moves (diagonals)
             if (rowDiff === colDiff) return !isBishopPathBlocked(fromRow, fromCol, toRow, toCol);
             break;
 
         case "queen":
-            // Queen moves (straight lines and diagonals)
-            if ((rowDiff === 0 && colDiff > 0) || (rowDiff > 0 && colDiff === 0) || (rowDiff === colDiff)) {
-                return !(
-                    (rowDiff === 0 && colDiff > 0 && isRookPathBlocked(fromRow, fromCol, toRow, toCol)) ||
-                    (rowDiff === colDiff && isBishopPathBlocked(fromRow, fromCol, toRow, toCol))
-                );
+            // Queen can move in straight lines or diagonally, check both rook and bishop logic
+            if ((rowDiff === 0 && colDiff > 0) || (rowDiff > 0 && colDiff === 0)) {
+                return !isRookPathBlocked(fromRow, fromCol, toRow, toCol); // Straight-line check
+            }
+            if (rowDiff === colDiff) {
+                return !isBishopPathBlocked(fromRow, fromCol, toRow, toCol); // Diagonal check
             }
             break;
 
         case "king":
-            // King moves (one step in any direction)
             if (rowDiff <= 1 && colDiff <= 1) return true;
             break;
 
         case "knight":
-            // Knight moves (L-shape)
             if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) return true;
             break;
 
         default:
-            return false; 
+            return false;
     }
-    // alert("wrong move");
     return false;
 }
+
 function isRookPathBlocked(fromRow, fromCol, toRow, toCol) {
     const rowDiff = toRow - fromRow;
     const colDiff = toCol - fromCol;
@@ -273,9 +260,9 @@ function switchTurn() {
 
     if (isInCheck(currentPlayer)) {
         if (isCheckmate(currentPlayer)) {
-            alert(`${currentPlayer === 'white' ? 'Black' : 'White'} wins by checkmate!`);
+            showToast(`${currentPlayer === 'white' ? 'Black' : 'White'} wins by checkmate!`);
         } else {
-            alert(`${currentPlayer} is in check!`);
+            showToast(`${currentPlayer} is in check!`);
         }
     }
 
@@ -292,7 +279,7 @@ function startTimer() {
             whiteTimerElement.textContent = `${formatTime(timerWhite)}`;
             if (timerWhite === 0) {
                 clearInterval(timerInterval);
-                alert('White ran out of time! Black wins.');
+                showToast('White ran out of time! Black wins.');
                 return;
             }
         } else {
@@ -300,7 +287,7 @@ function startTimer() {
             blackTimerElement.textContent = `${formatTime(timerBlack)}`;
             if (timerBlack === 0) {
                 clearInterval(timerInterval);
-                alert('Black ran out of time! White wins.');
+                showToast('Black ran out of time! White wins.');
                 return;
             }
         }
@@ -408,3 +395,33 @@ document.addEventListener('DOMContentLoaded', () => {
     blackTimerElement.textContent = `${formatTime(timerBlack)}`;
     initializeBoard();
 });
+
+
+//Toast Notification
+// Function to create and show toast notifications
+function showToast(message) {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.classList.add('toast');
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    // Show the toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+
+    // Hide the toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300); // Remove after transition
+    }, 3000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+    return container;
+}
