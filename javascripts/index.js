@@ -149,13 +149,15 @@ function isvalidmove(fromIndex, toIndex) {
     switch (pieceId) {
         case "pawn":
             if (pieceColor === 'white') {
-                if (fromCol === toCol && rowDiff === 1 && !targetPiece) return true; // Move one step forward
-                if (fromCol === toCol && rowDiff === 2 && !targetPiece && fromRow === 6) return true; // Move two steps forward from start
-                if (rowDiff === 1 && colDiff === 1 && targetPiece && targetColor === 'black') return true; // Capture diagonally
+                // White pawns move up the board (toRow < fromRow)
+                if (fromCol === toCol && rowDiff === 1 && fromRow > toRow && !targetPiece) return true; // Move one step forward
+                if (fromCol === toCol && rowDiff === 2 && fromRow === 6 && fromRow > toRow && !targetPiece) return true; // Move two steps forward from start
+                if (rowDiff === 1 && colDiff === 1 && fromRow > toRow && targetPiece && targetColor === 'black') return true; // Capture diagonally
             } else {
-                if (fromCol === toCol && rowDiff === 1 && !targetPiece) return true; // Move one step forward
-                if (fromCol === toCol && rowDiff === 2 && !targetPiece && fromRow === 1) return true; // Move two steps forward from start
-                if (rowDiff === 1 && colDiff === 1 && targetPiece && targetColor === 'white') return true; // Capture diagonally
+                // Black pawns move down the board (toRow > fromRow)
+                if (fromCol === toCol && rowDiff === 1 && fromRow < toRow && !targetPiece) return true; // Move one step forward
+                if (fromCol === toCol && rowDiff === 2 && fromRow === 1 && fromRow < toRow && !targetPiece) return true; // Move two steps forward from start
+                if (rowDiff === 1 && colDiff === 1 && fromRow < toRow && targetPiece && targetColor === 'white') return true; // Capture diagonally
             }
             break;
 

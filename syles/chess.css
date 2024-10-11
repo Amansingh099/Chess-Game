@@ -150,7 +150,8 @@ button:hover {
     width: 60px; /* Adjust the size as needed */
     height: 60px; /* Adjust the size as needed */
     background-color: rgba(80, 231, 80, 0.5); /* Light green */
-    
+    box-shadow: 2px 2px 2px #333;
+
     display: flex;
     
 }
